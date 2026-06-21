@@ -1,9 +1,8 @@
-import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 class RegistrationForm:
@@ -43,13 +42,12 @@ class RegistrationForm:
         driver.get(self.URL)
         driver.maximize_window()
         driver.implicitly_wait(5)
-        time.sleep(1)
         return self
 
     def teardown(self):
         self.driver.quit()
 
-    def fill_form(self, first_name=None, last_name=None, email=None, mobile_nubber=None, current_address=None):
+    def fill_form(self, first_name=None, last_name=None, email=None, mobile_number=None, current_address=None):
         if first_name is not None:
             self.driver.find_element(*self.FIRST_NAME) \
                 .send_keys(first_name)
@@ -59,9 +57,9 @@ class RegistrationForm:
         if email is not None:
             self.driver.find_element(*self.EMAIL) \
                 .send_keys(email)
-        if mobile_nubber is not None:
+        if mobile_number is not None:
             self.driver.find_element(*self.MOBILE_NUMBER) \
-                .send_keys(mobile_nubber)
+                .send_keys(mobile_number)
         if current_address is not None:
             self.driver.find_element(*self.CURRENT_ADDRESS) \
                 .send_keys(current_address)
@@ -79,7 +77,6 @@ class RegistrationForm:
                 .click()
         return self
 
-
     def select_date_of_birth(self, day: str, month: str, year: str):
         self.driver.find_element(*self.DATE_OF_BIRTH) \
             .click()
@@ -96,27 +93,24 @@ class RegistrationForm:
 
     def select_subjects(self, value):
         subjects = self.driver.find_element(*self.SUBJECTS)
-        email = self.driver.find_element(*self.EMAIL)  # Перевести курсор хоть куда для клика - кривая форма "subjects"
+        email = self.driver.find_element(*self.EMAIL)
 
         for element in value:
             email.click()  # Кликаем по почте
             subjects.click()
             xpath = f"//div[@class='subjects-auto-complete__option' and text()='{element}']"
-            self.fluent_wait.until(EC.visibility_of_element_located((By.XPATH, xpath))) \
+            self.fluent_wait.until(ec.visibility_of_element_located((By.XPATH, xpath))) \
                 .click()
-            # self.driver.find_element(By.XPATH, xpath).click()
         return self
 
-    def select_hobbies(self, sports=None, reading=None, music=None):
-        if sports is not None:
-            self.driver.find_element(*self.HOBBIES_SPORTS) \
-                .click()
-        if reading is not None:
-            self.driver.find_element(*self.HOBBIES_READING) \
-                .click()
-        if music is not None:
-            self.driver.find_element(*self.HOBBIES_MUSIC) \
-                .click()
+    def select_hobbies(self, hobbies):
+        for element in hobbies:
+            if element == "Sports":
+                self.driver.find_element(*self.HOBBIES_SPORTS).click()
+            if element == "Reading":
+                self.driver.find_element(*self.HOBBIES_READING).click()
+            if element == "Music":
+                self.driver.find_element(*self.HOBBIES_MUSIC).click()
         return self
 
     def input_picture(self, path):
@@ -124,25 +118,24 @@ class RegistrationForm:
             .send_keys(path)
         return self
 
-    def select_state_and_city(self, state, city):
-        field_state = self.driver.find_element(*self.STATE)
-        field_state.click()
-        path_state = f"//div[text()='{state}']"
-        select_state = self.driver.find_element(By.XPATH, path_state)
-        self.driver.execute_script("arguments[0].scrollIntoView();", select_state)
-        select_state.click()
-
-        field_city = self.driver.find_element(*self.CITY)
-        field_city.click()
-        path_city = f"//div[text()='{city}']"
-        select_city = self.driver.find_element(By.XPATH, path_city)
-        self.driver.execute_script("arguments[0].scrollIntoView();", select_city)
-        select_city.click()
+    def select_options(self, locator, option, scroll=True):
+        field = self.driver.find_element(*locator)
+        field.click()
+        path = f"//div[text()='{option}']"
+        select_option = self.driver.find_element(By.XPATH, path)
+        if scroll:
+            self.driver.execute_script("arguments[0].scrollIntoView();", select_option)
+        select_option.click()
         return self
 
+    def select_state(self, state):
+        return self.select_options(self.STATE, state)
+
+    def select_city(self, city):
+        return self.select_options(self.CITY, city)
+
     def close_modal(self):
-        # modal = self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Close']")
-        self.fluent_wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[aria-label='Close']"))) \
+        self.fluent_wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, "button[aria-label='Close']"))) \
             .click()
         return self
 
@@ -151,8 +144,7 @@ class RegistrationForm:
         return self
 
     def click_submit(self):
-        # submit_button = self.driver.find_element(*self.SUBMIT_BUTTON)
-        submit_button = self.fluent_wait.until(EC.element_to_be_clickable(self.SUBMIT_BUTTON))
+        submit_button = self.fluent_wait.until(ec.element_to_be_clickable(self.SUBMIT_BUTTON))
         self.driver.execute_script("arguments[0].scrollIntoView();", submit_button)
         submit_button.click()
         return self
@@ -162,11 +154,9 @@ class RegistrationForm:
         return error
 
     def find_result_table(self):
-        # result_table = self.driver.find_element(*self.RESULT_TABLE)
-        result_table = self.fluent_wait.until(EC.visibility_of_element_located(self.RESULT_TABLE))
+        result_table = self.fluent_wait.until(ec.visibility_of_element_located(self.RESULT_TABLE))
         return result_table
 
     def close_result_table(self):
         self.driver.find_element(*self.CLOSE_RESULT_TABLE) \
             .click()
-        # time.sleep(2)
