@@ -31,13 +31,15 @@ class LoginForm:
             self.driver.find_element(*self.PASSWORD).send_keys(password)
         return self
 
-    def click_submit(self):
-        self.driver.find_element(*self.SUBMIT_BUTTON).click()
+    def click_button(self, locator):
+        self.driver.find_element(*locator).click()
         return self
 
+    def click_submit(self):
+        return self.click_button(self.SUBMIT_BUTTON)
+
     def click_logout(self):
-        self.driver.find_element(*self.LOGOUT_BUTTON).click()
-        return self
+        return self.click_button(self.LOGOUT_BUTTON)
 
     def get_error_message(self):
         error = self.driver.find_element(*self.ERROR_MESSAGE)

@@ -61,7 +61,7 @@ def input_after_error():
         if test_2:
             test_2.teardown()
 
-# input_after_error()
+input_after_error()
 
 # Негативные проверки
 def input_incorrect_login():
@@ -87,4 +87,4 @@ def input_incorrect_login():
         if test_3:
             test_3.teardown()
 
-input_incorrect_login()
+# input_incorrect_login()
