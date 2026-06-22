@@ -1,33 +1,34 @@
 import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
 
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as ec
+from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class TestSuite:
-    FIRST_NAME          = (By.ID, "firstName")
-    LAST_NAME           = (By.ID, "lastName")
-    EMAIL               = (By.ID, "userEmail")
-    GENDER_MALE         = (By.ID, "gender-radio-1")
-    GENDER_FEMALE       = (By.ID, "gender-radio-2")
-    GENDER_OTHER        = (By.ID, "gender-radio-3")
-    MOBILE_NUMBER       = (By.ID, "userNumber")
-    DATE_OF_BIRTH       = (By.ID, "dateOfBirthInput")
-    SUBJECTS            = (By.ID, "subjectsInput")
-    HOBBIES_SPORTS      = (By.ID, "hobbies-checkbox-1")
-    HOBBIES_READING     = (By.ID, "hobbies-checkbox-2")
-    HOBBIES_MUSIC       = (By.ID, "hobbies-checkbox-3")
-    PICTURE             = (By.ID, "uploadPicture")
-    CURRENT_ADDRESS     = (By.ID, "currentAddress")
-    STATE               = (By.ID, "state")
-    CITY                = (By.ID, "city")
-    SUBMIT_BUTTON       = (By.ID, "submit")
-    RESULT_TABLE        = (By.ID, "resultBody")
-    CLOSE_RESULT_TABLE  = (By.ID, "closeModal")
-    ERROR               = (By.ID, "formError")
+    FIRST_NAME = (By.ID, "firstName")
+    LAST_NAME = (By.ID, "lastName")
+    EMAIL = (By.ID, "userEmail")
+    GENDER_MALE = (By.ID, "gender-radio-1")
+    GENDER_FEMALE = (By.ID, "gender-radio-2")
+    GENDER_OTHER = (By.ID, "gender-radio-3")
+    MOBILE_NUMBER = (By.ID, "userNumber")
+    DATE_OF_BIRTH = (By.ID, "dateOfBirthInput")
+    SUBJECTS = (By.ID, "subjectsInput")
+    HOBBIES_SPORTS = (By.ID, "hobbies-checkbox-1")
+    HOBBIES_READING = (By.ID, "hobbies-checkbox-2")
+    HOBBIES_MUSIC = (By.ID, "hobbies-checkbox-3")
+    PICTURE = (By.ID, "uploadPicture")
+    CURRENT_ADDRESS = (By.ID, "currentAddress")
+    STATE = (By.ID, "state")
+    CITY = (By.ID, "city")
+    SUBMIT_BUTTON = (By.ID, "submit")
+    RESULT_TABLE = (By.ID, "resultBody")
+    CLOSE_RESULT_TABLE = (By.ID, "closeModal")
+    ERROR = (By.ID, "formError")
 
     def __init__(self):
         self.url = "https://qa-guru.github.io/one-page-form/automation-practice-form.html"
@@ -153,23 +154,24 @@ class TestSuite:
         button = self.driver.find_element(*self.CLOSE_RESULT_TABLE)
         button.click()
 
+
 def positive_check():
-    test            = None
-    first_name      = "Alex"
-    last_name       = "Smit"
-    email           = "qwerty@mail.ru"
-    gender          = "Other"
-    phone_number    = "9876543211"
-    month           = "2"
-    year            = "1988"
-    day             = "13"
-    date            = day + " Mar " + year
-    subjects        = ["Maths", "English", "History"]
-    hobbies         = ["Sports", "Music"]
-    path            = "/Users/e.khomiakov/Desktop/file.BVkAlq.png"
+    test = None
+    first_name = "Alex"
+    last_name = "Smit"
+    email = "qwerty@mail.ru"
+    gender = "Other"
+    phone_number = "9876543211"
+    month = "2"
+    year = "1988"
+    day = "13"
+    date = day + " Mar " + year
+    subjects = ["Maths", "English", "History"]
+    hobbies = ["Sports", "Music"]
+    path = "/Users/e.khomiakov/Desktop/file.BVkAlq.png"
     current_address = "450 Park Avenue, Apt 3A, New York, NY 10022"
-    state           = "Uttar Pradesh"
-    city            = "Lucknow"
+    state = "Uttar Pradesh"
+    city = "Lucknow"
 
     try:
         test = TestSuite()
@@ -217,5 +219,6 @@ def positive_check():
     finally:
         if test:
             test.teardown()
+
 
 positive_check()
