@@ -4,10 +4,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 class TestSuite:
-    LOGIN_LOCATOR           = (By.ID, "login-input")
-    PASSWORD_LOCATOR        = (By.ID, "password-input")
-    SUBMIT_BUTTON_LOCATOR   = (By.ID, "submit-button")
-    ERROR_MESSAGE_LOCATOR   = (By.CSS_SELECTOR, "#error-message")
+    LOGIN               = (By.ID, "login-input")
+    PASSWORD            = (By.ID, "password-input")
+    SUBMIT_BUTTON       = (By.ID, "submit-button")
+    ERROR_MESSAGE       = (By.CSS_SELECTOR, "#error-message")
+    LOGOUT_BUTTON       = (By.ID, "logout-button")
+    WELCOME_MESSAGE     = (By.ID, "welcome-message")
 
     def __init__(self):
         self.url = "https://qa-guru.github.io/one-page-form/login.html"
@@ -15,64 +17,70 @@ class TestSuite:
 
     def set_up(self):
         driver = self.driver
+        driver.implicitly_wait(5)
         driver.get(self.url)
         driver.maximize_window()
+        return self
 
     def teardown(self):
         self.driver.quit()
 
-    def enter_login(self, login: str):
-        field = self.driver.find_element(*self.LOGIN_LOCATOR)
-        field.send_keys(login)
+    def fill_form(self, login=None, password=None):
+        if login is not None:
+            self.driver.find_element(*self.LOGIN).send_keys(login)
+        if password is not None:
+            self.driver.find_element(*self.PASSWORD).send_keys(password)
+        return self
 
-    def enter_password(self, password: str):
-        field = self.driver.find_element(*self.PASSWORD_LOCATOR)
-        field.send_keys(password)
+    def clear_form(self, login=False, password=False):
+        if login:
+            field = self.driver.find_element(*self.LOGIN)
+            field.click()
+            field.send_keys(Keys.COMMAND + "a")
+            field.send_keys(Keys.DELETE)
+        if password:
+            field = self.driver.find_element(*self.PASSWORD)
+            field.click()
+            field.send_keys(Keys.COMMAND + "a")
+            field.send_keys(Keys.DELETE)
+        return self
 
     def click_submit(self):
-        submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
-        submit_button.click()
-        # time.sleep(2)
+        self.driver.find_element(*self.SUBMIT_BUTTON) \
+            .click()
+        return self
 
-    def check_error_message(self):
-        error = self.driver.find_element(*self.ERROR_MESSAGE_LOCATOR)
+    def click_logout(self):
+        self.driver.find_element(*self.LOGOUT_BUTTON).click()
+        return self
+
+    def get_error_message(self):
+        error = self.driver.find_element(*self.ERROR_MESSAGE)
         return error.text
 
-    def clear_login(self):
-        field = self.driver.find_element(*self.LOGIN_LOCATOR)
-        field.click()  # Фокусируемся на поле
-        field.send_keys(Keys.COMMAND + "a")
-        field.send_keys(Keys.DELETE)
-
-    def clear_password(self):
-        field = self.driver.find_element(*self.PASSWORD_LOCATOR)
-        field.click()  # Фокусируемся на поле
-        field.send_keys(Keys.COMMAND + "a")
-        field.send_keys(Keys.DELETE)
-
+    def check_auth(self):
+        message = self.driver.find_element(*self.WELCOME_MESSAGE)
+        return message
 
 def re_enter():
     test          = None
     login_1       = "qw"
     password_1    = "qwq"
-    login_2       = "qaguru@qa.guru"
-    password_2    = "qaguru"
+    login_2       = "user1"
+    password_2    = "password1"
 
     try:
         test = TestSuite()
-        test.set_up()
-        test.enter_login(login_1)
-        test.enter_password(password_1)
-        test.click_submit()
-        test.clear_login()
-        test.enter_login(login_2)
-        test.clear_password()
-        test.enter_password(password_2)
-        test.click_submit()
-        error = test.check_error_message()
-        assert "Login" not in error, "Проверь логин (и пароль)" # "Login must be at least 3 characters" / "Login and password are required (minimum 3 and 6 characters)"
-        assert "Password" not in error, "Проверь пароль" # "Password must be at least 6 characters"
-        assert "Wrong" not in error, "Проверь логин и пароль" # "Wrong login or password"
+        test.set_up() \
+            .fill_form(login_1, password_1) \
+            .click_submit() \
+            .clear_form(True, True) \
+            .fill_form(login_2, password_2)\
+            .click_submit()
+        error = test.get_error_message()
+        assert not error, f"{error}"
+        auth = test.check_auth()
+        assert auth.text, "Авторизация не пройдена!"
         print("Тест успешно пройден!")
 
     except AssertionError as error:
@@ -82,6 +90,5 @@ def re_enter():
     finally:
         if test:
             test.teardown()
-
 
 re_enter()
